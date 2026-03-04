@@ -7,7 +7,6 @@ Agents die whenever their satiety or hydration becomes fully
 depleted.
 '''
 
-
 from dataclasses import dataclass
 import random
 import os
@@ -15,13 +14,11 @@ import csv
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
-
 # Config
-N_AGENTS = 30
-N_DAYS = 50
-GATHER_MEAN = 6.0
+N_AGENTS = 500
+N_DAYS = 100
+GATHER_MEAN = 5.0
 GATHER_NOISE = 0.35
-TRADE_RATIO = 1.0
 SATIETY_CAP = 30.0
 HYDRATION_CAP = 30.0
 LOG_FILE = 'island_sim_log.csv'
@@ -34,10 +31,10 @@ class Agent:
     Each agent has a set of attributes which evolve over time
     '''
     agent_id: int
-    satiety: float # food level (0 is death)
-    hydration: float # water level (0 is death)
-    hunger_rate: float # satiety lost per day
-    thirst_rate: float # hydration lost per day
+    satiety: float  # food level (0 is death)
+    hydration: float  # water level (0 is death)
+    hunger_rate: float  # satiety lost per day
+    thirst_rate: float  # hydration lost per day
     fish_efficiency: float
     coconut_efficiency: float
     coconuts: float = 0.0
@@ -55,7 +52,7 @@ class Agent:
     # Gather resources
     def gather(self):
         noise = random.uniform(1 - GATHER_NOISE, 1 + GATHER_NOISE)
-        amount = GATHER_MEAN * noise # daily resources gathered is random
+        amount = GATHER_MEAN * noise  # daily resources gathered is random
         choice = self.decide_gather()
         if choice == 'fish':
             self.fish += amount * self.fish_efficiency
@@ -68,7 +65,7 @@ class Agent:
         water_needed = self.thirst_rate
 
         # Eating
-        from_fish = min(self.fish, food_needed) # Cannot consume more than stock of fish
+        from_fish = min(self.fish, food_needed)  # Cannot consume more than stock of fish
         self.fish -= from_fish
         food_needed -= from_fish
 
@@ -83,7 +80,7 @@ class Agent:
 
         # Clip vitals at their limits
         self.satiety = min(self.satiety, SATIETY_CAP)
-        self.hydration = min(self.satiety, SATIETY_CAP)
+        self.hydration = min(self.hydration, HYDRATION_CAP)
 
         # Check for death
         if self.satiety <= 0 or self.hydration <= 0:
@@ -98,18 +95,14 @@ def do_trading(agents: list[Agent]):
     '''
 
     living = [a for a in agents if a.alive]
-    random.shuffle(living) # We get a random match of agents
-    pairs = [(living[i], living[i+1]) for i in range(0, len(living)-1, 2)]
+    random.shuffle(living)  # We get a random match of agents
+    pairs = [(living[i], living[i + 1]) for i in range(0, len(living) - 1, 2)]
 
     for a, b in pairs:
         # Thirst and hunger dictate preference (naive mechanism)
         if a.satiety > a.hydration and b.hydration > b.satiety:
             # A gives fish, B gives coconuts
             trade_volume = min(a.fish, b.coconuts, GATHER_MEAN)
-            print(f'[{a.agent_id}] -FISH-> [{b.agent_id}] / [{a.agent_id}] <-COCONUTS- [{b.agent_id}]')
-            print(f'Trade volume: {trade_volume}')
-            print(f'{a.agent_id} stocks --- F: {a.fish} -> {a.fish - trade_volume} / C: {a.coconuts} -> {a.coconuts + trade_volume}')
-            print(f'{b.agent_id} stocks --- F: {b.fish} -> {a.fish + trade_volume} / C: {b.coconuts} -> {b.coconuts - trade_volume}')
             a.fish -= trade_volume
             b.fish += trade_volume
             a.coconuts += trade_volume
@@ -128,13 +121,13 @@ def make_agents(n: int) -> list[Agent]:
     agents = []
     for i in range(n):
         agents.append(Agent(
-            agent_id = i,
-            satiety = random.uniform(10, 20),
-            hydration = random.uniform(10, 20),
-            hunger_rate = random.uniform(1.5, 3.5),
-            thirst_rate = random.uniform(0.5, 2.5),
-            fish_efficiency = random.uniform(0.6, 1.5),
-            coconut_efficiency = random.uniform(0.6, 1.5)
+            agent_id=i,
+            satiety=random.uniform(10, 20),
+            hydration=random.uniform(10, 20),
+            hunger_rate=random.uniform(0.5, 2.5),# Model thirst as more rapid than hunger
+            thirst_rate=random.uniform(1.5, 3.5),
+            fish_efficiency=random.uniform(0.6, 1.5),
+            coconut_efficiency=random.uniform(0.6, 1.5)
         ))
     return agents
 
@@ -162,7 +155,6 @@ def run_sim(n: int = N_AGENTS, days: int = N_DAYS):
                 a.gather()
 
         # Trade goods
-        print(f'Day: {day}')
         do_trading(agents)
 
         # Consume goods and trace deaths
@@ -180,7 +172,7 @@ def run_sim(n: int = N_AGENTS, days: int = N_DAYS):
                 'day': day,
                 'agent_id': a.agent_id,
                 'alive': int(a.alive),
-                'satiety': round(a.satiety, 2), # Round decimals
+                'satiety': round(a.satiety, 2),  # Round decimals
                 'hydration': round(a.hydration, 2),
                 'fish': round(a.fish, 2),
                 'coconuts': round(a.coconuts, 2),
@@ -193,7 +185,7 @@ def run_sim(n: int = N_AGENTS, days: int = N_DAYS):
         history['alive'].append(len(living))
         history['deaths'].append(deaths_today)
         history['mean_satiety'].append(
-            sum(a.satiety for a in living) / len(living) if living else 0) # Boolean logic for dead population
+            sum(a.satiety for a in living) / len(living) if living else 0)  # Ignores dead population
         history['mean_hydration'].append(
             sum(a.hydration for a in living) / len(living) if living else 0)
 
@@ -221,17 +213,17 @@ def save_log(log_rows: list[dict], path: str = LOG_FILE):
 def plot_results(agents: list[Agent], history: dict):
     days = history['day']
 
-    fig = plt.figure(figsize=(13, 9), facecolor='#0d1117')
-    fig.suptitle('Island Economy Simulation', fontsize=16,
+    fig = plt.figure(figsize=(12, 10), facecolor='#0d1117')
+    fig.suptitle('Island Economy Simulation: Results', fontsize=16,
                  color='white', fontweight='bold', y=0.97)
     gs = gridspec.GridSpec(2, 2)
 
     ax_pop = fig.add_subplot(gs[0, 0])
     ax_health = fig.add_subplot(gs[0, 1])
-    ax_deaths = fig.add_subplot(gs[1, 0])
-    ax_agents = fig.add_subplot(gs[1, 1])
+    ax_fish = fig.add_subplot(gs[1, 0])
+    ax_coconuts = fig.add_subplot(gs[1, 1])
 
-    for ax in (ax_pop, ax_health, ax_deaths, ax_agents):
+    for ax in (ax_pop, ax_health, ax_fish, ax_coconuts):
         ax.set_facecolor('#161b22')
         ax.tick_params(colors='gray')
         ax.xaxis.label.set_color('gray')
@@ -248,29 +240,48 @@ def plot_results(agents: list[Agent], history: dict):
     ax_pop.set_ylabel('Alive agents')
     ax_pop.set_ylim(bottom=0)
 
-    # Survivors by efficiency
+    # Vitals over time
+    ax_health.plot(days, history['mean_satiety'], color='#ff6600', linewidth=2, label='Mean satiety')
+    ax_health.plot(days, history['mean_hydration'], color='#58a6ff', linewidth=2, label='Mean hydration')
+    ax_health.set_title('Mean vitals')
+    ax_health.set_xlabel('Day')
+    ax_health.set_ylabel('Vital level')
+    ax_health.legend()
+
+    # Efficiency/rate plots
     fish_eff = []
+    fish_rate = []
     coconut_eff = []
+    coconut_rate = []
     survived = []
     for a in agents:
         fish_eff.append(a.fish_efficiency)
+        fish_rate.append(a.hunger_rate)
         coconut_eff.append(a.coconut_efficiency)
+        coconut_rate.append(a.thirst_rate)
         survived.append(a.alive)
-
     colours = ['green' if _ else 'red' for _ in survived]
-    scatter = ax_agents.scatter(
-        fish_eff, coconut_eff, c=colours, s=80, edgecolors='#30363d', linewidths=0.5
+
+    scatter1 = ax_fish.scatter(
+        fish_eff, fish_rate, c=colours, s=60, edgecolors='#30363d', linewidths=0.5, alpha=0.6
     )
-    ax_agents.set_title('Agent Efficiency\n(green=alive, red=dead)')
-    ax_agents.set_xlabel('Fish efficiency')
-    ax_agents.set_ylabel('Coconut efficiency')
+    ax_fish.set_title('Food rate comparison\n(green=alive, red=dead)')
+    ax_fish.set_xlabel('Fish efficiency')
+    ax_fish.set_ylabel('Hunger rate')
 
+    scatter2 = ax_coconuts.scatter(
+        coconut_eff, coconut_rate, c=colours, s=60, edgecolors='#30363d', linewidths=0.5, alpha=0.6
+    )
+    ax_coconuts.set_title('Water rate comparison\n(green=alive, red=dead)')
+    ax_coconuts.set_xlabel('Coconut rate')
+    ax_coconuts.set_ylabel('Thirst rate')
 
+    plt.tight_layout()
     plt.show()
 
 
 if __name__ == '__main__':
-    #random.seed(42)
+    random.seed(100)
 
     print(f'Starting simulation: {N_AGENTS} agents, {N_DAYS} days\n')
     agents, log_rows, history = run_sim(N_AGENTS, N_DAYS)
@@ -281,4 +292,3 @@ if __name__ == '__main__':
     save_log(log_rows, LOG_FILE)
 
     plot_results(agents, history)
-
