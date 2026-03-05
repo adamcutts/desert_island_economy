@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
 # Config
-N_AGENTS = 500
+N_AGENTS = 2000
 N_DAYS = 365
 GATHER_MEAN = 5.0
 GATHER_NOISE = 0.35
