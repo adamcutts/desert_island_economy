@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
 # Config
-N_AGENTS = 2000
+N_AGENTS = 200
 N_DAYS = 365
 GATHER_MEAN = 5.0
 GATHER_NOISE = 0.35
@@ -265,14 +265,14 @@ def plot_results(agents: list[Agent], history: dict):
     scatter1 = ax_fish.scatter(
         fish_eff, fish_rate, c=colours, s=60, edgecolors='#30363d', linewidths=0.5, alpha=0.6
     )
-    ax_fish.set_title('Fish attributes\n(green=alive, red=dead)')
+    ax_fish.set_title('Survival by food attributes\n(green=alive, red=dead)')
     ax_fish.set_xlabel('Fish gathering efficiency')
     ax_fish.set_ylabel('Hunger rate')
 
     scatter2 = ax_coconuts.scatter(
         coconut_eff, coconut_rate, c=colours, s=60, edgecolors='#30363d', linewidths=0.5, alpha=0.6
     )
-    ax_coconuts.set_title('Coconut attributes\n(green=alive, red=dead)')
+    ax_coconuts.set_title('Survival by water attributes\n(green=alive, red=dead)')
     ax_coconuts.set_xlabel('Coconut gathering efficiency')
     ax_coconuts.set_ylabel('Thirst rate')
 
@@ -281,7 +281,7 @@ def plot_results(agents: list[Agent], history: dict):
 
 
 if __name__ == '__main__':
-    #random.seed(100)
+    random.seed(5)
 
     print(f'Starting simulation: {N_AGENTS} agents, {N_DAYS} days\n')
     agents, log_rows, history = run_sim(N_AGENTS, N_DAYS)
