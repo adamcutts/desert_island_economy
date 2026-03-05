@@ -16,7 +16,7 @@ import matplotlib.gridspec as gridspec
 
 # Config
 N_AGENTS = 500
-N_DAYS = 100
+N_DAYS = 365
 GATHER_MEAN = 5.0
 GATHER_NOISE = 0.35
 SATIETY_CAP = 30.0
@@ -124,7 +124,7 @@ def make_agents(n: int) -> list[Agent]:
             agent_id=i,
             satiety=random.uniform(10, 20),
             hydration=random.uniform(10, 20),
-            hunger_rate=random.uniform(0.5, 2.5),# Model thirst as more rapid than hunger
+            hunger_rate=random.uniform(0.5, 3.5),# Model thirst as more rapid than hunger
             thirst_rate=random.uniform(1.5, 3.5),
             fish_efficiency=random.uniform(0.6, 1.5),
             coconut_efficiency=random.uniform(0.6, 1.5)
@@ -265,15 +265,15 @@ def plot_results(agents: list[Agent], history: dict):
     scatter1 = ax_fish.scatter(
         fish_eff, fish_rate, c=colours, s=60, edgecolors='#30363d', linewidths=0.5, alpha=0.6
     )
-    ax_fish.set_title('Food rate comparison\n(green=alive, red=dead)')
-    ax_fish.set_xlabel('Fish efficiency')
+    ax_fish.set_title('Fish attributes\n(green=alive, red=dead)')
+    ax_fish.set_xlabel('Fish gathering efficiency')
     ax_fish.set_ylabel('Hunger rate')
 
     scatter2 = ax_coconuts.scatter(
         coconut_eff, coconut_rate, c=colours, s=60, edgecolors='#30363d', linewidths=0.5, alpha=0.6
     )
-    ax_coconuts.set_title('Water rate comparison\n(green=alive, red=dead)')
-    ax_coconuts.set_xlabel('Coconut rate')
+    ax_coconuts.set_title('Coconut attributes\n(green=alive, red=dead)')
+    ax_coconuts.set_xlabel('Coconut gathering efficiency')
     ax_coconuts.set_ylabel('Thirst rate')
 
     plt.tight_layout()
@@ -281,7 +281,7 @@ def plot_results(agents: list[Agent], history: dict):
 
 
 if __name__ == '__main__':
-    random.seed(100)
+    #random.seed(100)
 
     print(f'Starting simulation: {N_AGENTS} agents, {N_DAYS} days\n')
     agents, log_rows, history = run_sim(N_AGENTS, N_DAYS)
