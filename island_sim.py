@@ -9,14 +9,13 @@ depleted.
 
 from dataclasses import dataclass
 import random
-import os
 import csv
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
 # Config
-N_AGENTS = 200
-N_DAYS = 365
+N_AGENTS = 250
+N_DAYS = 100
 GATHER_MEAN = 5.0
 GATHER_NOISE = 0.35
 SATIETY_CAP = 30.0
@@ -281,7 +280,7 @@ def plot_results(agents: list[Agent], history: dict):
 
 
 if __name__ == '__main__':
-    random.seed(5)
+    random.seed(100)
 
     print(f'Starting simulation: {N_AGENTS} agents, {N_DAYS} days\n')
     agents, log_rows, history = run_sim(N_AGENTS, N_DAYS)
