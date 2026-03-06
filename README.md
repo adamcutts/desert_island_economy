@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This is a project I have made for fun, in the spirit of the latest *Lord of the Flies* adaptation on the BBC. 
+This is a project I made for fun, in the spirit of the latest *Lord of the Flies* adaptation on the BBC. 
 
 Suppose that a cruise ship becomes stranded on a desert island. Beyond the reach of phone signals, the $n$ passengers realise they must gather resources and co-operate if they are to survive. 
 
@@ -30,6 +30,17 @@ The function `run_sim()` runs the simulation and returns a full log, as well as 
 
 Here we see the plot for `N_AGENTS = 250`, `N_DAYS = 100`, and `random.seed(100)`:
 
+![alt text](https://github.com/adamcutts/desert_island_economy/blob/main/desert_island_4_plots.png)
+
 ## Conclusion
 
-text
+There is plenty of scope for extending this project. Examples of places to go next include:
+1. More complex trading strategies;
+2. Trading strategies that vary across the population (e.g. an innate stubborness to trade in some agents);
+3. The ability for the population to grow as well as shrink;
+4. A move to finite resources, or seasonality in resource scarcity;
+5. Aging agents, who require more resources as they age.
+
+Even without these extensions, the model is quite rich, and there is plenty to investigate in terms of model behaviour as a function of the parameters.
+
+Finally, the next step is to make a script making the `island_sim_log.csv` more amenable to time-series analysis by reshaping it into a .csv with one row per day.
